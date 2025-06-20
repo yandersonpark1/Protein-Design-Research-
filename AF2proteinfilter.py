@@ -47,7 +47,7 @@ class AF2proteinfilter():
         """
         self.filtered_df = self.filtered_df[self.filtered_df[column] > min_ipTM]
     
-    def PAEperContact(self): 
+    def PAEperContact(self, max_PAE_per_contact = 5, column = "PAE/ ctct"): 
         """
         PAE is the predicted aligned error, which is a measure of the uncertainty in the predicted structure.  
         Considers the total number of contacts between the two chains (more contacts means possibly more stable interface) 
@@ -57,9 +57,10 @@ class AF2proteinfilter():
         where x is the chain of the protein binder and y is the N terminal residue (ligand).
         We want a lower score meaning that there is less uncertainty in the predicted structure where contact between the residues
         of chain x and chain y is considered.
+        We want to be less than 5 because around 5 is max angstroms for a non covalent interaction to be considered a contact.
         Note: does not consider the whole domain of chain x and chain y, but rather the contact between the two residues of the chain.
         """
-        pass
+        self.filtered_df = self.filtered_df[self.filtered_df[column] < max_PAE_per_contact]
         
     def hbonding(self, min_hbonds = 2, column = "hbonding B1"): 
         #may want to consider number of h bonds that should not be formed on [b2:] 
