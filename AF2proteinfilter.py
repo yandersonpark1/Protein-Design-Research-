@@ -133,4 +133,5 @@ def main():
     filter_data.PAEperContact()
     filter_data.hbonding()
     filter_data.SASA()
+    filter_data.save_filtered_data()
     
