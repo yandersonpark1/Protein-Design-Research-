@@ -110,6 +110,12 @@ class AF2proteinfilter():
         # Keep only rows where no other hbonding column exceeds the reference
         self.filtered_df = self.filtered_df[~mask]
         
+    def save_filtered_data(self, output_file="filtered_protein_predictions.xlsx"):
+        """
+        Save the filtered DataFrame to an Excel file.
+        """
+        self.filtered_df.to_excel(output_file, index=False)
+        print(f"Filtered data saved to {output_file}")
     
 
 
@@ -120,4 +126,11 @@ def main():
     Reads Excel Sheet with AlphaFold protein predictions
     """""
     file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
-    filter_data = AF2Proteinfilter(file)
+    filter_data = AF2proteinfilter(file)
+    filter_data.plDDT()
+    filter_data.pTM()
+    filter_data.ipTM()
+    filter_data.PAEperContact()
+    filter_data.hbonding()
+    filter_data.SASA()
+    
