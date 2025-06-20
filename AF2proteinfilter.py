@@ -1,11 +1,20 @@
+import pandas as pd
 
 #Possible things to consider for the AF2proteinfilter class:
 # - plDDT: per chain, average, and per residue if 70-90 possible to recycle 
-class AF2proteinfilter: 
-    def __init__(self, af2protein): 
-        self.af2protein = af2protein
+class AF2proteinfilter(): 
+    """
+    potential_binders: list of potential protein binders; may need to be recycled. PLDDT is between 70-90 (sidechains may 
+    need to be examined) and ipTM is between .6 -.8. PAE/Contact and pTM still meet thresholds.
+    """
     
-    def plDDT(): 
+    def __init__(self, af2protein, df): 
+        self.df = df
+        self.af2protein = af2protein
+        self.potential_binders = []
+        self.binders = []
+    
+    def plDDT(self): 
         """
         plDDT is a measure of the local distance difference test, which is a metric for the quality of protein structure predictions.
         > 90 is considered high confidence with confidence in backbone and side chains, 
@@ -16,7 +25,24 @@ class AF2proteinfilter:
         as it is not a protein binder we are creating. Our plDDT All is the average of all chains in the protein,
         which should not be used as plDDT y is also considered in the calculation of the average.
         """
+        plDDT_score = self.df.loc['pLDT A'] 
+        if plDDT_score >= 89.5:
+            self.binders.append(self.af2protein)
+        elif 70 <= plDDT_score <= 90:
+            self.potential_binders.append(self.af2protein)
+        else: 
+            self.df.drop(self.current_index)
+        
+        
     
+    def pTM(): 
+        """
+        pTM is the predicted template modeling score, which is a measure of the quality of protein structure predictions.
+        Checks if all chains are corretly folded and positioned globally. In this case, we would want to consider iPTM a little bit more
+        because we would have to consider the global structure of the protein binder and the N terminal residue (ligand) and their
+        relative positions based on their possible interactions. 
+        In general though, we want a pTM score above .5. Anything else is considered low confidence and likely a failed prediction.
+        """
     
     def ipTM(): 
         """
@@ -42,6 +68,30 @@ class AF2proteinfilter:
         Note: does not consider the whole domain of chain x and chain y, but rather the contact between the two residues of the chain.
         """
         
+    def hbonding(min_hbonds): 
+        #may want to consider number of h bonds that should not be formed on [b2:] 
+        """
+        We want to look at the number of hydrogen bonds between the n terminal residue and the protein binder. One thing to consider
+        is we do not want a lot of hydorgen bonds between the whole chain of the ligand because that might imply that the ligand will not 
+        only be binded by N terminal residue, but also by other residues in the chain. In this case, for tyrosine, we want two hydrogen bonds to form 
+        off the oxyegn on the side chain and possibly three hydrogen bonds to form off the Nitrogen on the amine group. 
+        While we may not be able to configure the hydrogen bonds (we could but would need to implmemnt a graph algorithm) we could 
+        say that there should be at least two hydorgen bonds off the b1 residue of the ligand in the case of tyrosine. 
+        min_hbonds is an integer representing the minimum number of hydrogen bonds that should be formed between the n terminal residue 
+        and the protein binder where you can find the min by taking the number of polar atoms on the n terminal residue that may form 
+        h bonds. 
+        """
+    
+    def SASA(): 
+        """
+        SASA is the solvent accessible surface area, which is a measure of the surface area of a protein that is accessible to solvent.
+        In our case, the Solvent is water as we have soluble proteins. We want to consider the SASA of the N terminal residue (ligand) and the protein binder. 
+        If the SASA of the N terminal residue is too high, it may indicate that the ligand is exposed and not properly binded and concealed.
+        If the SASA of the protein binder is too low, it may indicate that the binder has completely binded to more than just the N terminal residue.
+        However, a low SASA is still good but should not be considered for final product. A good way to consider this would be 
+        where the b1 sasa is higher than [b2, bn] (n being the last residue in the chain).
+        """
+        
     
 
 
@@ -49,5 +99,8 @@ class AF2proteinfilter:
 def main(): 
     """
     Main function to test the AF2proteinfilter class
-    Run an excel file with proteins
+    Reads Excel Sheet with AlphaFold protein predictions
     """""
+    file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
+    df = pd.read_excel(file, sheet_name=0, header = 1, usecols = ["name", "bind seq", "pLDT all","pLDT A", "pLDT B", "pTM", "ipTM", "ctct sc", "# ctct", "PAE/ ctct"])
+    filter = df.AF2Proteinfilter()
