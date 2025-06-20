@@ -61,7 +61,7 @@ class AF2proteinfilter():
         """
         pass
         
-    def hbonding(min_hbonds): 
+    def hbonding(self, min_hbonds = 2, column = "hbonding B1"): 
         #may want to consider number of h bonds that should not be formed on [b2:] 
         """
         We want to look at the number of hydrogen bonds between the n terminal residue and the protein binder. One thing to consider
@@ -74,10 +74,21 @@ class AF2proteinfilter():
         and the protein binder where you can find the min by taking the number of polar atoms on the n terminal residue that may form 
         h bonds. 
         """
-        pass
+        
+        self.filtered_df = self.filtered_df[self.filtered_df[column] >= min_hbonds]
+        
+        # Find all hbonding columns except original column
+        hbonding_cols = set()
+        hbonding_cols = [col for col in self.filtered_df.columns if ("hbonding" in col) and (col != column)]
+
+        # Create a mask: True if any other hbonding column > reference column
+        mask = (self.filtered_df[hbonding_cols].gt(self.filtered_df[column], axis=0)).any(axis=1)
+
+        # Keep only rows where no other hbonding column exceeds the reference
+        self.filtered_df = self.filtered_df[~mask]
     
     
-    def SASA(): 
+    def SASA(self, max_SASA_b1 = 100, column = "SASA B1"): 
         """
         SASA is the solvent accessible surface area, which is a measure of the surface area of a protein that is accessible to solvent.
         In our case, the Solvent is water as we have soluble proteins. We want to consider the SASA of the N terminal residue (ligand) and the protein binder. 
@@ -86,7 +97,17 @@ class AF2proteinfilter():
         However, a low SASA is still good but should not be considered for final product. A good way to consider this would be 
         where the b1 sasa is higher than [b2, bn] (n being the last residue in the chain).
         """
-        pass
+        self.filtered_df = self.filtered_df[self.filtered_df[column] <= max_SASA_b1]
+        
+        # Find all SASA columns except original column
+        SASA_cols = set()
+        SASA_cols = [col for col in self.filtered_df.columns if ("SASA" in col) and (col != column)]
+
+        # Create a mask: True if any other hbonding column > reference column
+        mask = (self.filtered_df[SASA_cols].gt(self.filtered_df[column], axis=0)).any(axis=1)
+
+        # Keep only rows where no other hbonding column exceeds the reference
+        self.filtered_df = self.filtered_df[~mask]
         
     
 
