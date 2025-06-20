@@ -4,17 +4,14 @@ import pandas as pd
 # - plDDT: per chain, average, and per residue if 70-90 possible to recycle 
 class AF2proteinfilter(): 
     """
-    potential_binders: list of potential protein binders; may need to be recycled. PLDDT is between 70-90 (sidechains may 
-    need to be examined) and ipTM is between .6 -.8. PAE/Contact and pTM still meet thresholds.
+    AF2proteinfilter class to filter AlphaFold protein predictions based on metrics [plDDT, pTM, iPTM, PAE/Contact, hbonding, SASA]
     """
     
-    def __init__(self, af2protein, df): 
-        self.df = df
-        self.af2protein = af2protein
-        self.potential_binders = []
-        self.binders = []
+    def __init__(self, input_file): 
+        self.df = pd.read_excel(input_file, sheet_name=0, header=1, usecols=["name", "bind seq", "pLDT all", "pLDT A", "pLDT B", "pTM", "ipTM", "ctct sc", "# ctct", "PAE/ ctct"])
+        self.filtered_df = self.df.copy()
     
-    def plDDT(self): 
+    def plDDT(self, min_plDDT = 89.5, column = "pLDT A"): 
         """
         plDDT is a measure of the local distance difference test, which is a metric for the quality of protein structure predictions.
         > 90 is considered high confidence with confidence in backbone and side chains, 
@@ -25,17 +22,11 @@ class AF2proteinfilter():
         as it is not a protein binder we are creating. Our plDDT All is the average of all chains in the protein,
         which should not be used as plDDT y is also considered in the calculation of the average.
         """
-        plDDT_score = self.df.loc['pLDT A'] 
-        if plDDT_score >= 89.5:
-            self.binders.append(self.af2protein)
-        elif 70 <= plDDT_score <= 90:
-            self.potential_binders.append(self.af2protein)
-        else: 
-            self.df.drop(self.current_index)
+        self.filtered_df = self.filtered_df[self.filtered_df[column] > min_plDDT]
         
         
     
-    def pTM(): 
+    def pTM(self, min_pTM = 0.5, column = "pTM"): 
         """
         pTM is the predicted template modeling score, which is a measure of the quality of protein structure predictions.
         Checks if all chains are corretly folded and positioned globally. In this case, we would want to consider iPTM a little bit more
@@ -43,8 +34,9 @@ class AF2proteinfilter():
         relative positions based on their possible interactions. 
         In general though, we want a pTM score above .5. Anything else is considered low confidence and likely a failed prediction.
         """
+        self.filtered_df = self.filtered_df[self.filtered_df[column] > min_pTM]
     
-    def ipTM(): 
+    def ipTM(self, min_ipTM = 0.8, column = "ipTM"): 
         """
         ipTM measures relative accuracy of predicted position of subunits forming protein-protein complexes.
         > 0.8 is confident in a high quality prediction,
@@ -53,9 +45,9 @@ class AF2proteinfilter():
         recycled until convergence is reached and then compare back to filter)
         Metric is somewhat correlated to plDDT y, and therfore takes it place
         """
-        
+        self.filtered_df = self.filtered_df[self.filtered_df[column] > min_ipTM]
     
-    def PAEperContact(): 
+    def PAEperContact(self): 
         """
         PAE is the predicted aligned error, which is a measure of the uncertainty in the predicted structure.  
         Considers the total number of contacts between the two chains (more contacts means possibly more stable interface) 
@@ -67,6 +59,7 @@ class AF2proteinfilter():
         of chain x and chain y is considered.
         Note: does not consider the whole domain of chain x and chain y, but rather the contact between the two residues of the chain.
         """
+        pass
         
     def hbonding(min_hbonds): 
         #may want to consider number of h bonds that should not be formed on [b2:] 
@@ -81,6 +74,8 @@ class AF2proteinfilter():
         and the protein binder where you can find the min by taking the number of polar atoms on the n terminal residue that may form 
         h bonds. 
         """
+        pass
+    
     
     def SASA(): 
         """
@@ -91,6 +86,7 @@ class AF2proteinfilter():
         However, a low SASA is still good but should not be considered for final product. A good way to consider this would be 
         where the b1 sasa is higher than [b2, bn] (n being the last residue in the chain).
         """
+        pass
         
     
 
@@ -102,5 +98,4 @@ def main():
     Reads Excel Sheet with AlphaFold protein predictions
     """""
     file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
-    df = pd.read_excel(file, sheet_name=0, header = 1, usecols = ["name", "bind seq", "pLDT all","pLDT A", "pLDT B", "pTM", "ipTM", "ctct sc", "# ctct", "PAE/ ctct"])
-    filter = df.AF2Proteinfilter()
+    filter_data = AF2Proteinfilter(file)
