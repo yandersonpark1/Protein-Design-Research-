@@ -36,7 +36,7 @@ class AF2proteinfilter():
         """
         self.filtered_df = self.filtered_df[self.filtered_df[column] > min_pTM]
     
-    def ipTM(self, min_ipTM = 0.8, column = "ipTM"): 
+    def ipTM(self, min_ipTM = 0.6, column = "ipTM"): 
         """
         ipTM measures relative accuracy of predicted position of subunits forming protein-protein complexes.
         > 0.8 is confident in a high quality prediction,
@@ -47,7 +47,7 @@ class AF2proteinfilter():
         """
         self.filtered_df = self.filtered_df[self.filtered_df[column] > min_ipTM]
     
-    def PAEperContact(self, max_PAE_per_contact = 5, column = "PAE/ ctct"): 
+    def PAEperContact(self, max_PAE_per_contact = 10, column = "PAE/ ctct"): 
         """
         PAE is the predicted aligned error, which is a measure of the uncertainty in the predicted structure.  
         Considers the total number of contacts between the two chains (more contacts means possibly more stable interface) 
@@ -78,15 +78,6 @@ class AF2proteinfilter():
         
         self.filtered_df = self.filtered_df[self.filtered_df[column] >= min_hbonds]
         
-        # Find all hbonding columns except original column
-        hbonding_cols = set()
-        hbonding_cols = [col for col in self.filtered_df.columns if ("hbonding" in col) and (col != column)]
-
-        # Create a mask: True if any other hbonding column > reference column
-        mask = (self.filtered_df[hbonding_cols].gt(self.filtered_df[column], axis=0)).any(axis=1)
-
-        # Keep only rows where no other hbonding column exceeds the reference
-        self.filtered_df = self.filtered_df[~mask]
     
     
     def SASA(self, max_SASA_b1 = 100, column = "SASA B1"): 
