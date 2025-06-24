@@ -87,16 +87,16 @@ class AF2proteinfilter():
         If the SASA of the N terminal residue is too high, it may indicate that the ligand is exposed and not properly binded and concealed.
         If the SASA of the protein binder is too low, it may indicate that the binder has completely binded to more than just the N terminal residue.
         However, a low SASA is still good but should not be considered for final product. A good way to consider this would be 
-        where the b1 sasa is higher than [b2, bn] (n being the last residue in the chain).
+        the b2 to bn side chain where n represents the last number of the residue on the sidechain.
         """
         self.filtered_df = self.filtered_df[self.filtered_df[column] <= max_SASA_b1]
         
         # Find all SASA columns except original column
         SASA_cols = set()
-        SASA_cols = [col for col in self.filtered_df.columns if ("SASA" in col) and (col != column)]
+        SASA_cols = [col for col in self.filtered_df.columns if ("sc" in col) and (col != "B1 sc")]
 
         # Create a mask: True if any other hbonding column > reference column
-        mask = (self.filtered_df[SASA_cols].gt(self.filtered_df[column], axis=0)).any(axis=1)
+        mask = (self.filtered_df[SASA_cols] < 30).all(axis=1)
 
         # Keep only rows where no other hbonding column exceeds the reference
         self.filtered_df = self.filtered_df[~mask]
