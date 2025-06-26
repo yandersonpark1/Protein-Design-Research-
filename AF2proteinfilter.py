@@ -44,6 +44,7 @@ class AF2proteinfilter():
         You could recycle the predictions until a degree of convergence is reached (Maybe a good protein binder should be individually
         recycled until convergence is reached and then compare back to filter)
         Metric is somewhat correlated to plDDT y, and therfore takes it place
+        Ideally at end we have greater than or equal to 0.8 but for initial filtering, we will consider 0.6 as the minimum.
         """
         self.filtered_df = self.filtered_df[self.filtered_df[column] > min_ipTM]
     
