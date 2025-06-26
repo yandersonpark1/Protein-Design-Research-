@@ -8,10 +8,10 @@ class AF2proteinfilter():
     """
     
     def __init__(self, input_file): 
-        self.df = pd.read_excel(input_file, sheet_name=0, header=1, usecols=["idx", "path", "diff", "MPNN", "name", "bb", "seq", "bind seq", "pep", "pLDDT all", "pLDDT A", "pLDDT B", "pTM", "ipTM", "evo pro", "ctct sc", "# ctct", "PAE/ ctct", "total", "hbonding B1", "hbonding B2", "hbonding B3", "SASA B1", "SASA B2", "SASA B3", "B1 bb", "B2 bb", "B3 bb", "B1 sc", "B2 sc", "B3 sc"])
+        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'seq', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct'])
         self.filtered_df = self.df.copy()
     
-    def plDDT(self, min_plDDT = 89.5, column = "pLDDT A"): 
+    def plDDT(self, min_plDDT = 89.5, column = "plDDT A"): 
         """
         plDDT is a measure of the local distance difference test, which is a metric for the quality of protein structure predictions.
         > 90 is considered high confidence with confidence in backbone and side chains, 
@@ -102,11 +102,11 @@ class AF2proteinfilter():
         # Keep only rows where no other hbonding column exceeds the reference
         self.filtered_df = self.filtered_df[~mask]
         
-    def save_filtered_data(self, output_file="filtered_protein_predictions.xlsx"):
+    def save_filtered_data(self, output_file="v7filtered_protein_predictions.xlsx"):
         """
         Save the filtered DataFrame to an Excel file.
         """
-        self.filtered_df.to_excel(output_file, index=False)
+        self.filtered_df.to_excel((output_file), index=False)
         print(f"Filtered data saved to {output_file}")
     
 
@@ -118,13 +118,15 @@ def main():
     Reads Excel Sheet with AlphaFold protein predictions
     """""
     file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
+    df = pd.read_excel(file)
+    print(df.columns)
     filter_data = AF2proteinfilter(file)
     filter_data.plDDT()
     filter_data.pTM()
     filter_data.ipTM()
     filter_data.PAEperContact()
-    filter_data.hbonding()
-    filter_data.SASA()
+    # filter_data.hbonding()
+    # filter_data.SASA()
     filter_data.save_filtered_data()
 
 if __name__ == "__main__":
