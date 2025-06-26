@@ -8,10 +8,10 @@ class AF2proteinfilter():
     """
     
     def __init__(self, input_file): 
-        self.df = pd.read_excel(input_file, sheet_name=0, header=1, usecols=["idx", "path", "diff", "MPNN", "name", "bb", "seq", "bind seq", "pep", "pLDT all", "pLDT A", "pLDT B", "pTM", "ipTM", "evo pro", "ctct sc", "# ctct", "PAE/ ctct", "total", "hbonding B1", "hbonding B2", "hbonding B3", "SASA B1", "SASA B2", "SASA B3", "B1 bb", "B2 bb", "B3 bb", "B1 sc", "B2 sc", "B3 sc"])
+        self.df = pd.read_excel(input_file, sheet_name=0, header=1, usecols=["idx", "path", "diff", "MPNN", "name", "bb", "seq", "bind seq", "pep", "pLDDT all", "pLDDT A", "pLDDT B", "pTM", "ipTM", "evo pro", "ctct sc", "# ctct", "PAE/ ctct", "total", "hbonding B1", "hbonding B2", "hbonding B3", "SASA B1", "SASA B2", "SASA B3", "B1 bb", "B2 bb", "B3 bb", "B1 sc", "B2 sc", "B3 sc"])
         self.filtered_df = self.df.copy()
     
-    def plDDT(self, min_plDDT = 89.5, column = "pLDT A"): 
+    def plDDT(self, min_plDDT = 89.5, column = "pLDDT A"): 
         """
         plDDT is a measure of the local distance difference test, which is a metric for the quality of protein structure predictions.
         > 90 is considered high confidence with confidence in backbone and side chains, 
