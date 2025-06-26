@@ -23,7 +23,7 @@ def convert_csvs_in_folder(input_file): #folder_path = 'Tyr_ClpS_250624/V7'
     #         input_path = os.path.join(folder_path, filename)
     #         base_name = os.path.splitext(filename)[0]
     #         output_path = os.path.join(folder_path, base_name + '.xlsx')
-    output_path = (input_file + '.xlsx')
+    output_path = (input_file.removesuffix('.csv') + '.xlsx')
     converter = CSVtoXcl(input_file, output_path)
     converter.convert()
          
