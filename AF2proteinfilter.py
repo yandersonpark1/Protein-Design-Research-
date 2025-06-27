@@ -8,7 +8,7 @@ class AF2proteinfilter():
     """
     
     def __init__(self, input_file): 
-        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'seq', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct'])
+        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', '# ctct@residue', 'PAE/ ctct@residue','ctct score@residue'])
         self.filtered_df = self.df.copy()
     
     def plDDT(self, min_plDDT = 89.5, column = "plDDT A"): 
