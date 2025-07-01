@@ -2,7 +2,7 @@ import pandas as pd
 
 #Possible things to consider for the AF2proteinfilter class:
 # - plDDT: per chain, average, and per residue if 70-90 possible to recycle 
-class AF2proteinfilter(): 
+class LMPNN_dist_Af3proteinfilter(): 
     """
     AF2proteinfilter class to filter AlphaFold protein predictions based on metrics [plDDT, pTM, iPTM, PAE/Contact, hbonding, SASA]
     """
@@ -103,10 +103,11 @@ class AF2proteinfilter():
         # Keep only rows where no other hbonding column exceeds the reference
         self.filtered_df = self.filtered_df[~mask]
         
-    def save_filtered_data(self, output_file="v7filtered_protein_predictions.xlsx"):
+    def save_filtered_data(self, version):
         """
         Save the filtered DataFrame to an Excel file.
         """
+        output_file=f"lMPNN_dist_v{version}filtered_protein_predictions.xlsx"
         self.filtered_df.to_excel((output_file), index=False)
         print(f"Filtered data saved to {output_file}")
     
@@ -119,16 +120,17 @@ def main():
     Reads Excel Sheet with AlphaFold protein predictions
     """""
     file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
+    version = input(int("Enter the version of the LMPNN_dist you are using (e.g., 1, 2, 3): "))
     df = pd.read_excel(file)
     print(df.columns)
-    filter_data = AF2proteinfilter(file)
+    filter_data = LMPNN_dist_Af3proteinfilter(file)
     filter_data.plDDT()
     filter_data.pTM()
     filter_data.ipTM()
     filter_data.PAEperContact()
     # filter_data.hbonding()
     # filter_data.SASA()
-    filter_data.save_filtered_data()
+    filter_data.save_filtered_data(version)
 
 if __name__ == "__main__":
     main()
