@@ -9,7 +9,7 @@ class LMPNN_dist_Af3proteinfilter():
     
     def __init__(self, input_file): 
         ''' Change depending on the input file format '''
-        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', '# ctct@residue', 'PAE/ ctct@residue','ctct score@residue'])
+        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', '# ctct@residue', 'PAE/ ctct@residue','ctct score@residue', 'hbond count', 'hbond b1', 'hbond b2', 'hbond b3', 'B1 total SASA', 'b1 bb', 'b1 sc', 'B2 total SASA', 'b2 bb', 'b2 sc', 'B3 total SASA', 'b3 bb', 'b3 sc'])
         self.filtered_df = self.df.copy()
     
     def plDDT(self, min_plDDT = 89.5, column = "plDDT A"): 
@@ -64,7 +64,7 @@ class LMPNN_dist_Af3proteinfilter():
         """
         self.filtered_df = self.filtered_df[self.filtered_df[column] < max_PAE_per_contact]
         
-    def hbonding(self, min_hbonds = 2, column = "hbonding B1"): 
+    def hbonding(self, min_hbonds = 2, column = "hbond b1"): 
         #may want to consider number of h bonds that should not be formed on [b2:] 
         """
         We want to look at the number of hydrogen bonds between the n terminal residue and the protein binder. One thing to consider
@@ -82,7 +82,7 @@ class LMPNN_dist_Af3proteinfilter():
         
     
     
-    def SASA(self, max_SASA_b1 = 100, column = "SASA B1"): 
+    def SASA(self, max_SASA_b1 = 100, column = "B1 total SASA"): 
         """
         SASA is the solvent accessible surface area, which is a measure of the surface area of a protein that is accessible to solvent.
         In our case, the Solvent is water as we have soluble proteins. We want to consider the SASA of the N terminal residue (ligand) and the protein binder. 
@@ -128,8 +128,8 @@ def main():
     filter_data.pTM()
     filter_data.ipTM()
     filter_data.PAEperContact()
-    # filter_data.hbonding()
-    # filter_data.SASA()
+    filter_data.hbonding()
+    filter_data.SASA()
     filter_data.save_filtered_data(version)
 
 if __name__ == "__main__":

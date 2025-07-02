@@ -4,10 +4,12 @@ class combinehbond_SASA_AF3:
     Class to combine hbonding and SASA metrics for AlphaFold protein predictions.
     """
     
-    def __init__(self, input_file): 
+    def __init__(self, hbond_file, SASA_file, AF3_file): 
         ''' Change depending on the input file format '''
-        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'plDDT', 'pTM', 'ipTM', 'hbonding', 'SASA'])
-        self.filtered_df = self.df.copy()
+        self.hbond_df = pd.read_excel(hbond_file, header=0, usecols=['hbond count', 'hbond b1', 'hbond b2', 'hbond b3'])
+        self.SASA_file = pd.read_excel(SASA_file, header=0, usecols=['B1 total SASA', 'b1 bb', 'b1 sc', 'B2 total SASA', 'b2 bb', 'b2 sc', 'B3 total SASA', 'b3 bb', 'b3 sc'])
+        '''for non parsing use: ['diff', 'bb', 'seq #', 'seq', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct']'''
+        self.Af3_file = pd.read_excel(hbond_file, header=0, usecols=['diff', 'bb', 'seq #', 'seq', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct'])
     
     def hbonding(self, min_hbonding = 2, column = "hbonding"): 
         """
