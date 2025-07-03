@@ -12,7 +12,7 @@ class LMPNN_dist_Af3proteinfilter():
         self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', '# ctct@residue', 'PAE/ ctct@residue','ctct score@residue', 'hbond count', 'hbond b1', 'hbond b2', 'hbond b3', 'B1 total SASA', 'b1 bb', 'b1 sc', 'B2 total SASA', 'b2 bb', 'b2 sc', 'B3 total SASA', 'b3 bb', 'b3 sc'])
         self.filtered_df = self.df.copy()
     
-    def plDDT(self, min_plDDT = 89.5, column = "plDDT A"): 
+    def plDDT(self, min_plDDT = 80, column = "plDDT A"): 
         """
         plDDT is a measure of the local distance difference test, which is a metric for the quality of protein structure predictions.
         > 90 is considered high confidence with confidence in backbone and side chains, 
