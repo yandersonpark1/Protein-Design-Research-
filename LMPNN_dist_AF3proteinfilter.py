@@ -107,7 +107,7 @@ class LMPNN_dist_Af3proteinfilter():
         """
         Save the filtered DataFrame to an Excel file.
         """
-        output_file=f"lMPNN_dist_v{version}filtered_protein_predictions.xlsx"
+        output_file=f"{version}_dist_filtered_metrics.xlsx"
         self.filtered_df.to_excel((output_file), index=False)
         print(f"Filtered data saved to {output_file}")
     

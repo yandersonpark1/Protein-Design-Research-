@@ -1,8 +1,10 @@
 import pandas as pd
-import combinehbond_SASA_AF3 
+from combinehbond_SASA_distAF3 import combinehbond_SASA_distAF3
+import combinehbond_SASA_distAF3 
+
 import hbondCSVtoXcl
-import SASA_CSVtoXcel
-import CSVtoXcl
+import SASA_CSVtoXcel 
+import CSVtoXcl as converter
 
 #may have error trying to convert to xcel if we are rewriting the same file
 class Run_distXcel: 
@@ -20,7 +22,9 @@ class Run_distXcel:
             self.SASA_file = SASA_CSVtoXcel.convert_csvs(self.SASA_file)
         #Run the combine hbond and SASA to xcel conversion
         if self.hbond_file and self.SASA_file:
-            combinehbond_SASA_AF3.run(self.hbond_file, self.SASA_file)
+            combiner = combinehbond_SASA_distAF3(self.file, self.hbond_file, self.SASA_file)
+            
+            
         #Run the CSV to xcel conversion
         CSVtoXcl.run(self.file)
         self.file = 

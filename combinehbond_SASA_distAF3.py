@@ -17,9 +17,9 @@ class combinehbond_SASA_distAF3:
     
 
 def main():
-    AF3_file = input("Enter the name of the AF3 CSV file: ")
-    hbond_file = input("Enter the name of the hbond CSV file: ")
-    SASA_file = input("Enter the name of the SASA CSV file: ")
+    AF3_file = input("Enter the name of the AF3 Xcl file: ")
+    hbond_file = input("Enter the name of the hbond Xcl file: ")
+    SASA_file = input("Enter the name of the SASA Xcl file: ")
     version = input("Enter the version for the output file (e.g., '1'): ")
     
     combiner = combinehbond_SASA_distAF3(AF3_file, hbond_file, SASA_file)
