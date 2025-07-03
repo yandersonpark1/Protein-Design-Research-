@@ -1,6 +1,6 @@
 
 import pandas as pd
-class combinehbond_SASA_AF3: 
+class combinehbond_SASA_distAF3: 
     """
     Class to combine hbonding and SASA metrics for AlphaFold protein predictions.
     """
@@ -22,7 +22,7 @@ def main():
     SASA_file = input("Enter the name of the SASA CSV file: ")
     version = input("Enter the version for the output file (e.g., '1'): ")
     
-    combiner = combinehbond_SASA_AF3(AF3_file, hbond_file, SASA_file)
+    combiner = combinehbond_SASA_distAF3(AF3_file, hbond_file, SASA_file)
     combiner.combine(version)
 
 if __name__ == "__main__":
