@@ -9,7 +9,8 @@ class LMPNN_Af3proteinfilter():
     
     def __init__(self, input_file): 
         ''' Change depending on the input file format '''
-        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'seq name', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', 'hbond count', 'hbond b1', 'hbond b2', 'hbond b3', 'B1 total SASA', 'b1 bb', 'b1 sc', 'B2 total SASA', 'b2 bb', 'b2 sc', 'B3 total SASA', 'b3 bb', 'b3 sc'])
+        self.df = pd.read_excel(input_file, header=0, usecols=['diff', 'bb', 'seq #', 'seq name', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct'])
+        #, 'hbond count', 'hbond b1', 'hbond b2', 'hbond b3', 'B1 total SASA', 'b1 bb', 'b1 sc', 'B2 total SASA', 'b2 bb', 'b2 sc', 'B3 total SASA', 'b3 bb', 'b3 sc'
         self.filtered_df = self.df.copy()
     
     def plDDT(self, min_plDDT = 80, column = "plDDT A"): 
@@ -128,8 +129,8 @@ def main():
     filter_data.pTM()
     filter_data.ipTM()
     filter_data.PAEperContact()
-    filter_data.hbonding()
-    filter_data.SASA()
+    # filter_data.hbonding()
+    # filter_data.SASA()
     filter_data.save_filtered_data(version)
 
 if __name__ == "__main__":
