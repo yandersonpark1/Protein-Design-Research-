@@ -120,7 +120,7 @@ def main():
     Reads Excel Sheet with AlphaFold protein predictions
     """""
     file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
-    version = int(input(("Enter the version of the LMPNN_dist you are using (e.g., 1, 2, 3): ")))
+    version = str(input(("Enter the version of the LMPNN_dist you are using (e.g., 1, 2, 3): ")))
     df = pd.read_excel(file)
     print(df.columns)
     filter_data = LMPNN_Af3proteinfilter(file)
