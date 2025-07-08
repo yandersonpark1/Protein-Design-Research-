@@ -103,11 +103,11 @@ class LMPNN_dist_Af3proteinfilter():
         # Keep only rows where no other hbonding column exceeds the reference
         self.filtered_df = self.filtered_df[~mask]
         
-    def save_filtered_data(self, version):
+    def save_filtered_data(self, version, scaffold):
         """
         Save the filtered DataFrame to an Excel file.
         """
-        output_file=f"{version}_dist_filtered_metrics.xlsx"
+        output_file=f"{version}_{scaffold}_dist_filtered_metrics.xlsx"
         self.filtered_df.to_excel((output_file), index=False)
         print(f"Filtered data saved to {output_file}")
     
@@ -120,7 +120,8 @@ def main():
     Reads Excel Sheet with AlphaFold protein predictions
     """""
     file = input(str("Enter the path to the Excel file with AlphaFold protein predictions: "))
-    version = int(input(("Enter the version of the LMPNN_dist you are using (e.g., 1, 2, 3): ")))
+    version = (input(("Enter the version of the LMPNN_dist you are using (e.g., 1, 2, 3): ")))
+    scaffold = (input(("Enter the scaffold of the protein binder (e.g., ClPS, etc.): ")))
     df = pd.read_excel(file)
     print(df.columns)
     filter_data = LMPNN_dist_Af3proteinfilter(file)
@@ -130,7 +131,7 @@ def main():
     filter_data.PAEperContact()
     filter_data.hbonding()
     filter_data.SASA()
-    filter_data.save_filtered_data(version)
+    filter_data.save_filtered_data(version, scaffold)
 
 if __name__ == "__main__":
     main()
