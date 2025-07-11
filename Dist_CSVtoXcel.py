@@ -9,7 +9,7 @@ class Dist_CSVtoXcl:
         self.input_file = input_file
         self.output_file = output_file
         self.df = pd.read_csv(input_file, skiprows = 0)
-        self.columns = ['diff', 'bb', 'seq #', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', '# ctct@residue', 'PAE/ ctct@residue','ctct score@residue']
+        self.columns = ['diff', 'bb', 'seq #', 'seq name', 'plDDT', 'plDDT A', 'plDDT B', 'pTM', 'ipTM', 'evo pro', 'ctct score', '# ctct', 'PAE/ ctct', '# ctct@residue', 'PAE/ ctct@residue','ctct score@residue']
     
     def convert(self): 
         self.df.columns = self.columns
