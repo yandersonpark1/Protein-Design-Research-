@@ -12,7 +12,7 @@ class SASA_CSVtoXcl:
         self.columns = ['B1 total SASA', 'b1 bb', 'b1 sc', 'B2 total SASA', 'b2 bb', 'b2 sc', 'B3 total SASA', 'b3 bb', 'b3 sc']
     
     def convert(self): 
-        self.df = self.df.iloc[:, 3]  
+        self.df = self.df.iloc[:, 4:13]  
         self.df.columns = self.columns
         self.df.to_excel(self.output_file, index=False)
         print(f"Converted {self.input_file} to {self.output_file}")
