@@ -1,0 +1,212 @@
+
+4. TEST for selectivity
+
+
+# Run selectivity tests on designs
+#	other binders:  YAASAS, YII, YWW,  YDK, YKD, YAAA, YAGS, YAAS
+#   other non-binders: AYAA, AAYA, apo
+#   YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA
+# 	# n=399 + 37 = 436
+
+# v1: hit designs from 2.runs and 3.runs, 2.af3_hit_0.7_hb_SASA_fltr3_Asn, 3.af3_hit_0.7_hb_SA_fltr123_Asn
+# v2: hit designs from 5.mpnn_af3 v1/v2 runs
+
+# run with af3 distributor
+for j in 8; do
+mkdir 4.1.af3_tests_v1_mut${j}
+for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
+  mkdir 4.1.af3_tests_v1_mut${j}/$i
+  #cp 2.af3_dist_setup/seqs_v${j}.csv 4.1.af3_tests_v1_mut${j}/$i/seqs.csv
+  cp 2.af3_dist_setup/af3.flags 4.1.af3_tests_v1_mut${j}/$i/
+  cp 2.af3_dist_setup/dist.flags 4.1.af3_tests_v1_mut${j}/$i/
+  cp 2.af3_dist_setup/run_af3_dist.sh 4.1.af3_tests_v1_mut${j}/$i/ 
+  cp seqs.csv 4.1.af3_tests_v1_mut${j}/$i/
+done
+done
+
+# replace ,YAA with desired chain B sequence
+for j in 8; do
+for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
+  cd 4.1.af3_tests_v1_mut${j}/$i/
+  sed -i "s/,YAA/,${i}/g" seqs.csv
+  sed -i "s/,apo//g" seqs.csv
+  cd ../../
+done
+done
+
+# generate jsons
+for j in 8; do
+for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
+  cd 4.1.af3_tests_v1_mut${j}/$i/
+  cp seqs.csv seqs_jsons.csv
+  sed -i "s/,/,A:protein:/1" seqs.csv
+  sed -i "s/,/,B:protein:/2" seqs.csv
+  cd ../../
+done
+done
+
+# modify scorefile
+for j in 8; do
+for i in apo; do
+  cd 4.1.af3_tests_v1_mut${j}/$i/
+  sed -i "s/custom_score_target_res_B1/custom_score_apo/1" dist.flags
+  cd ../../
+done
+done
+
+
+# run af3 
+for j in 8; do
+for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
+  cd 4.1.af3_tests_v1_mut${j}/$i/; sbatch run_af3_dist.sh;  cd ../../
+done
+done
+
+# run af3 on sycamore
+for j in 1; do
+for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo; do
+  cd 4.af3_tests_v${j}/$i; 
+  # submit sycamore run
+  sbatch run_af3_dist_sy.sh;  
+  cd ../../
+done
+done
+
+
+
+# run replicates for apo and YAAGGA
+for j in 8; do
+for i in apo YAAG YAAGGA; do
+  cd 4.1.af3_tests_v1_mut${j}/$i; pwd
+  for k in 1 2 3; do  
+  mkdir $k; 
+  cp seqs.csv $k; cp run_af3_dist.sh $k;
+  cp run_af3_dist_sy.sh $k; 
+  cp dist.flags $k; cp af3.flags $k; 
+  done
+  cd ../../
+done
+done
+
+for j in 8; do
+for i in apo YAAG YAAGGA; do
+  cd 4.1.af3_tests_v1_mut${j}/$i;
+  for k in 1 2 3; do 
+  cd $k;
+  # sed -i "s/a100-gpu/kuhlab/g" run_af3_dist.sh
+  sbatch run_af3_dist.sh
+  #sbatch run_af3_dist_sy.sh
+  cd ../
+  done
+  cd ../../
+done
+done
+
+--------------------------
+
+# process af3 tests as af3_dist runs
+
+mkdir 4.1.af3_tests_data
+for v in 6; do
+for dir in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do 
+    cd 4.1.af3_tests_v1_mut${v}/$dir; pwd
+    echo "processing af3 outputs for $dir"
+    cp outputs/all_scores.csv ../../4.1.af3_tests_data/4.1.af3_test_v1_mut${v}_${dir}.csv
+    cd ../../
+done
+done
+
+# process apo and XAAGGA reps
+for v in 6; do
+for dir in apo YAAG YAAGGA; do 
+  for i in 1 2 3; do 
+  cd 4.1.af3_tests_v1_mut${v}/${dir}/${i}; 
+  echo "processing af3 outputs for $dir"
+  cp outputs/all_scores.csv ../../../4.1.af3_tests_data/4.1.af3_tests_v1_mut${v}_${dir}_rep${i}.csv
+  cd ../../../
+  done
+done
+done
+
+# clean distributor scorefiles
+cd 4.1.af3_tests_data
+for i in 4.1.af3_test_*.csv; do
+  # need to escape [ char
+  sed -i 's/(//g' $i;  sed -i 's/)//g' $i;  sed -i 's/\[//g' $i; sed -i 's/]//g' $i; sed -i 's/_/,/g' $i; 
+  sort -n -t ',' -k1,1 -k2,2 -k3,3 $i -o ${i}
+  awk -F',' -v OFS=',' '{print $1, $2, $3, $5, $11, $12, $9, $10, $6, $7, $8, $13, $14, $15 }' $i > ${i::-4}_clean.csv
+done
+cd ../
+
+# combine 
+cd 4.1.af3_tests_data
+for v in 6; do
+paste -d, \
+  <(cut -d, -f1-8 4.1.af3_test_v1_mut${v}_YAASAS_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YII_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YWW_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YDK_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YKD_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YAAA_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YAGS_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YAAS_clean.csv) \
+  <(cut -d, -f4,9 4.1.af3_test_v1_mut${v}_apo_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_AYAA_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YAAG_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YYW_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_FAA_clean.csv) \
+  <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_AAYA_clean.csv) > combined_4.af3_dist_v${v}.csv
+done
+cd ../
+
+# combine replica for apo, XAAG, XAAGGA
+
+# for apo
+cd 4.1.af3_tests_data
+for v in 6; do 
+  #echo "processing data for v${v}"
+  #head -n 1 4.1.af3_tests_v1_mut${v}_apo_rep1.csv >> 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv
+  #for i in 1 2 3; do 
+    #tail -n +2 4.1.af3_tests_v1_mut${v}_apo_rep${i}.csv >> 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv
+  #done
+
+  #sort -n -t ',' -k1,1 -k2,2 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv -o 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv
+  # combine columns 1/2
+  #awk -F',' -v OFS=',' '{print $1, $3, $4, $5, $2 }' 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv > 4.1.af3_tests_v${v}_apo_all_reps_cln.csv
+  # add all 1's col5 
+  awk 'BEGIN {FS=OFS=","} NR==1{$5="type"; print} NR>1{$4="apo"; $5="1"; print}' 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv > 4.af3_tests_v1_mut${v}_apo_all_reps_cln2.csv
+done 
+cd ../
+
+
+# for YAAG YAAGGA
+cd 4.1.af3_tests_data
+for v in 6; do
+  for k in YAAG YAAGGA; do 
+  echo "processing data for v${v}, ${k}"
+  rm 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
+  head -n 1 4.1.af3_tests_v1_mut${v}_${k}_rep1.csv >> 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
+  for i in 1 2 3; do 
+    tail -n +2 4.1.af3_tests_v1_mut${v}_${k}_rep${i}.csv >> 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
+  done
+  
+  sort -n -t ',' -k1,1 -k2,2 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv -o 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
+  sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv 
+  # combine columns 1/2, make spaces
+  awk -F',' -v OFS=',' '{print $1, $3, $9, $10, $7, $8, $4, $5, $6, $11, $12, $13, $26, $26}' 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv > 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv
+  sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv 
+
+  # add col4/5
+  if [[ ${k} == "YAAG" ]]; then
+    awk 'BEGIN {FS=OFS=","} NR==1{$14="type"; print} NR>1{$13="YAAG"; $14="3"; print}' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv > 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv
+    sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv 
+  else
+  # XAAGGA , 2
+    awk 'BEGIN {FS=OFS=","} NR==1{$14="type"; print} NR>1{$13="YAAGGA"; $14="2"; print}' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv > 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv
+    sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv 
+  fi 
+  done
+done 
+cd ../
+
+
