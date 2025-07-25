@@ -106,12 +106,12 @@ done
 
 # process af3 tests as af3_dist runs
 
-mkdir 4.1.af3_tests_data
-for v in 6; do
+mkdir 4.1.af3_tests_data_mut7
+for v in 7; do
 for dir in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do 
     cd 4.1.af3_tests_v1_mut${v}/$dir; pwd
     echo "processing af3 outputs for $dir"
-    cp outputs/all_scores.csv ../../4.1.af3_tests_data/4.1.af3_test_v1_mut${v}_${dir}.csv
+    cp outputs/all_scores.csv ../../4.1.af3_tests_data_mut7/4.1.af3_test_v1_mut${v}_${dir}.csv
     cd ../../
 done
 done
