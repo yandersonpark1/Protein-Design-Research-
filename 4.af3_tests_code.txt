@@ -106,30 +106,30 @@ done
 
 # process af3 tests as af3_dist runs
 
-mkdir 4.1.af3_tests_data_mut7
-for v in 7; do
+mkdir 4.1.af3_tests_data_mut8
+for v in 8; do
 for dir in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do 
     cd 4.1.af3_tests_v1_mut${v}/$dir; pwd
     echo "processing af3 outputs for $dir"
-    cp outputs/all_scores.csv ../../4.1.af3_tests_data_mut7/4.1.af3_test_v1_mut${v}_${dir}.csv
+    cp outputs/all_scores.csv ../../4.1.af3_tests_data_mut8/4.1.af3_test_v1_mut${v}_${dir}.csv
     cd ../../
 done
 done
 
 # process apo and XAAGGA reps
-for v in 7; do
+for v in 8; do
 for dir in apo YAAG YAAGGA; do 
   for i in 1 2 3; do 
   cd 4.1.af3_tests_v1_mut${v}/${dir}/${i}; 
   echo "processing af3 outputs for $dir"
-  cp outputs/all_scores.csv ../../../4.1.af3_tests_data_mut7/4.1.af3_test_v1_mut${v}_${dir}_rep${i}.csv
+  cp outputs/all_scores.csv ../../../4.1.af3_tests_data_mut8/4.1.af3_test_v1_mut${v}_${dir}_rep${i}.csv
   cd ../../../
   done
 done
 done
 
 # clean distributor scorefiles
-cd 4.1.af3_tests_data_mut7
+cd 4.1.af3_tests_data_mut8
 for i in 4.1.af3_test_*.csv; do
   # need to escape [ char
   sed -i 's/(//g' $i;  sed -i 's/)//g' $i;  sed -i 's/\[//g' $i; sed -i 's/]//g' $i; sed -i 's/_/,/g' $i; 
@@ -139,8 +139,8 @@ done
 cd ../
 
 # combine 
-cd 4.1.af3_tests_data_mut7
-for v in 7; do
+cd 4.1.af3_tests_data_mut8
+for v in 8; do
 paste -d, \
   <(cut -d, -f1-8 4.1.af3_test_v1_mut${v}_YAASAS_clean.csv) \
   <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YII_clean.csv) \
@@ -162,8 +162,8 @@ cd ../
 # combine replica for apo, XAAG, XAAGGA
 
 # for apo
-cd 4.1.af3_tests_data_mut7
-for v in 7; do 
+cd 4.1.af3_tests_data_mut8
+for v in 8; do 
   echo "processing data for v${v}"
   head -n 1 4.1.af3_test_v1_mut${v}_apo_rep1.csv >> 4.1.af3_test_v1_mut${v}_apo_all_reps.csv
   for i in 1 2 3; do 
@@ -180,8 +180,8 @@ cd ../
 
 
 # for YAAG YAAGGA
-cd 4.1.af3_tests_data_mut7
-for v in 7; do
+cd 4.1.af3_tests_data_mut8
+for v in 8; do
   for k in YAAG YAAGGA; do 
   echo "processing data for v${v}, ${k}"
   rm 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv
