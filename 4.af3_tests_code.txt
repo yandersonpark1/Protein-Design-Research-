@@ -117,19 +117,19 @@ done
 done
 
 # process apo and XAAGGA reps
-for v in 6; do
+for v in 7; do
 for dir in apo YAAG YAAGGA; do 
   for i in 1 2 3; do 
   cd 4.1.af3_tests_v1_mut${v}/${dir}/${i}; 
   echo "processing af3 outputs for $dir"
-  cp outputs/all_scores.csv ../../../4.1.af3_tests_data/4.1.af3_tests_v1_mut${v}_${dir}_rep${i}.csv
+  cp outputs/all_scores.csv ../../../4.1.af3_tests_data_mut7/4.1.af3_test_v1_mut${v}_${dir}_rep${i}.csv
   cd ../../../
   done
 done
 done
 
 # clean distributor scorefiles
-cd 4.1.af3_tests_data
+cd 4.1.af3_tests_data_mut7
 for i in 4.1.af3_test_*.csv; do
   # need to escape [ char
   sed -i 's/(//g' $i;  sed -i 's/)//g' $i;  sed -i 's/\[//g' $i; sed -i 's/]//g' $i; sed -i 's/_/,/g' $i; 
@@ -139,8 +139,8 @@ done
 cd ../
 
 # combine 
-cd 4.1.af3_tests_data
-for v in 6; do
+cd 4.1.af3_tests_data_mut7
+for v in 7; do
 paste -d, \
   <(cut -d, -f1-8 4.1.af3_test_v1_mut${v}_YAASAS_clean.csv) \
   <(cut -d, -f4-8 4.1.af3_test_v1_mut${v}_YII_clean.csv) \
@@ -162,48 +162,48 @@ cd ../
 # combine replica for apo, XAAG, XAAGGA
 
 # for apo
-cd 4.1.af3_tests_data
-for v in 6; do 
-  #echo "processing data for v${v}"
-  #head -n 1 4.1.af3_tests_v1_mut${v}_apo_rep1.csv >> 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv
-  #for i in 1 2 3; do 
-    #tail -n +2 4.1.af3_tests_v1_mut${v}_apo_rep${i}.csv >> 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv
-  #done
+cd 4.1.af3_tests_data_mut7
+for v in 7; do 
+  echo "processing data for v${v}"
+  head -n 1 4.1.af3_test_v1_mut${v}_apo_rep1.csv >> 4.1.af3_test_v1_mut${v}_apo_all_reps.csv
+  for i in 1 2 3; do 
+    tail -n +2 4.1.af3_test_v1_mut${v}_apo_rep${i}.csv >> 4.1.af3_test_v1_mut${v}_apo_all_reps.csv
+  done
 
-  #sort -n -t ',' -k1,1 -k2,2 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv -o 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv
+  sort -n -t ',' -k1,1 -k2,2 4.1.af3_test_v1_mut${v}_apo_all_reps.csv -o 4.1.af3_test_v1_mut${v}_apo_all_reps.csv
   # combine columns 1/2
-  #awk -F',' -v OFS=',' '{print $1, $3, $4, $5, $2 }' 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv > 4.1.af3_tests_v${v}_apo_all_reps_cln.csv
+  awk -F',' -v OFS=',' '{print $1, $3, $4, $5, $2 }' 4.1.af3_test_v1_mut${v}_apo_all_reps.csv > 4.1.af3_test_v${v}_apo_all_reps_cln.csv
   # add all 1's col5 
-  awk 'BEGIN {FS=OFS=","} NR==1{$5="type"; print} NR>1{$4="apo"; $5="1"; print}' 4.1.af3_tests_v1_mut${v}_apo_all_reps.csv > 4.af3_tests_v1_mut${v}_apo_all_reps_cln2.csv
+  awk 'BEGIN {FS=OFS=","} NR==1{$5="type"; print} NR>1{$4="apo"; $5="1"; print}' 4.1.af3_test_v1_mut${v}_apo_all_reps.csv > 4.af3_test_v1_mut${v}_apo_all_reps_cln2.csv
 done 
 cd ../
 
 
 # for YAAG YAAGGA
-cd 4.1.af3_tests_data
-for v in 6; do
+cd 4.1.af3_tests_data_mut7
+for v in 7; do
   for k in YAAG YAAGGA; do 
   echo "processing data for v${v}, ${k}"
-  rm 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
-  head -n 1 4.1.af3_tests_v1_mut${v}_${k}_rep1.csv >> 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
+  rm 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv
+  head -n 1 4.1.af3_test_v1_mut${v}_${k}_rep1.csv >> 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv
   for i in 1 2 3; do 
-    tail -n +2 4.1.af3_tests_v1_mut${v}_${k}_rep${i}.csv >> 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
+    tail -n +2 4.1.af3_test_v1_mut${v}_${k}_rep${i}.csv >> 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv
   done
   
-  sort -n -t ',' -k1,1 -k2,2 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv -o 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv
-  sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv 
+  sort -n -t ',' -k1,1 -k2,2 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv -o 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv
+  
   # combine columns 1/2, make spaces
-  awk -F',' -v OFS=',' '{print $1, $3, $9, $10, $7, $8, $4, $5, $6, $11, $12, $13, $26, $26}' 4.1.af3_tests_v1_mut${v}_${k}_all_reps.csv > 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv
-  sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv 
+  awk -F',' -v OFS=',' '{print $1, $2, $3, $5, $11, $12, $9, $10, $4, $6, $7, $8, $13, $14, $15, $26, $26}' 4.1.af3_test_v1_mut${v}_${k}_all_reps.csv > 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln.csv
+  
 
   # add col4/5
   if [[ ${k} == "YAAG" ]]; then
-    awk 'BEGIN {FS=OFS=","} NR==1{$14="type"; print} NR>1{$13="YAAG"; $14="3"; print}' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv > 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv
-    sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv 
+    awk 'BEGIN {FS=OFS=","} NR==1{$14="type"; print} NR>1{$13="YAAG"; $14="3"; print}' 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln.csv > 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln2.csv
+    sed -i 's/[()\[\]]//g' 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln2.csv 
   else
   # XAAGGA , 2
-    awk 'BEGIN {FS=OFS=","} NR==1{$14="type"; print} NR>1{$13="YAAGGA"; $14="2"; print}' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln.csv > 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv
-    sed -i 's/[()\[\]]//g' 4.1.af3_tests_v1_mut${v}_${k}_all_reps_cln2.csv 
+    awk 'BEGIN {FS=OFS=","} NR==1{$14="type"; print} NR>1{$13="YAAGGA"; $14="2"; print}' 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln.csv > 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln2.csv
+    sed -i 's/[()\[\]]//g' 4.1.af3_test_v1_mut${v}_${k}_all_reps_cln2.csv 
   fi 
   done
 done 
