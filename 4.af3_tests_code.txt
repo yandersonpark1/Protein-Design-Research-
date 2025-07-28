@@ -12,10 +12,10 @@
 # v2: hit designs from 5.mpnn_af3 v1/v2 runs
 
 # run with af3 distributor
-for j in 4; do
+for j in 5; do
 mkdir 4.2.af3_tests_v1_mut${j}
 for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
-  mkdir 4.1.af3_tests_v1_mut${j}/$i
+  mkdir 4.2.af3_tests_v1_mut${j}/$i
   #cp 2.af3_dist_setup/seqs_v${j}.csv 4.2.af3_tests_v1_mut${j}/$i/seqs.csv
   cp 2.af3_dist_setup/af3.flags 4.2.af3_tests_v1_mut${j}/$i/
   cp 2.af3_dist_setup/dist.flags 4.2.af3_tests_v1_mut${j}/$i/
@@ -25,28 +25,28 @@ done
 done
 
 # replace ,YAA with desired chain B sequence
-for j in 8; do
+for j in 5; do
 for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
   cd 4.2.af3_tests_v1_mut${j}/$i/
-  sed -i "s/,YAA/,${i}/g" seqs.csv
-  sed -i "s/,apo//g" seqs.csv
+  sed -i "s/B:protein:YAA/B:protein:${i}/g" seqs.csv
+  sed -i "s/:apo//g" seqs.csv
   cd ../../
 done
 done
 
 # generate jsons
-for j in 8; do
+for j in 5; do
 for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
   cd 4.2.af3_tests_v1_mut${j}/$i/
   cp seqs.csv seqs_jsons.csv
-  sed -i "s/,/,A:protein:/1" seqs.csv
-  sed -i "s/,/,B:protein:/2" seqs.csv
+  #sed -i "s/,/,A:protein:/1" seqs.csv
+  #sed -i "s/,/,B:protein:/2" seqs.csv
   cd ../../
 done
 done
 
 # modify scorefile
-for j in 8; do
+for j in 5; do
 for i in apo; do
   cd 4.2.af3_tests_v1_mut${j}/$i/
   sed -i "s/custom_score_target_res_B1/custom_score_apo/1" dist.flags
@@ -56,7 +56,7 @@ done
 
 
 # run af3 
-for j in 8; do
+for j in 5; do
 for i in YAASAS YII YWW  YDK YKD YAAA YAGS YAAS AYAA AAYA apo YAAGGA YAAG YYW FAA; do
   cd 4.2.af3_tests_v1_mut${j}/$i/; sbatch run_af3_dist.sh;  cd ../../
 done
@@ -75,20 +75,21 @@ done
 
 
 # run replicates for apo and YAAGGA
-for j in 8; do
+for j in 5; do
 for i in apo YAAG YAAGGA; do
   cd 4.2.af3_tests_v1_mut${j}/$i; pwd
   for k in 1 2 3; do  
   mkdir $k; 
-  cp seqs.csv $k; cp run_af3_dist.sh $k;
-  cp run_af3_dist_sy.sh $k; 
+  cp seqs.csv $k; 
+  cp run_af3_dist.sh $k;
+  #cp run_af3_dist_sy.sh $k; 
   cp dist.flags $k; cp af3.flags $k; 
   done
   cd ../../
 done
 done
 
-for j in 8; do
+for j in 5; do
 for i in apo YAAG YAAGGA; do
   cd 4.2.af3_tests_v1_mut${j}/$i;
   for k in 1 2 3; do 
