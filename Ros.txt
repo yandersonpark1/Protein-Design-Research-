@@ -1,0 +1,132 @@
+04-16-2025
+- windows: /drives/c/Users/Tiger/TIGER/Medicine/UNC/Kuhlman_Lab/rosetta/runs/2025-04/250416_Nterm_Phe/
+- sycamore: /work/users/t/i/tigerz/kuhlman_lab/rosetta/runs/2025-04/250416_Nterm_Phe/
+- structures from multiple directories, de novo Nterm binders
+	- hit criteria: pLDDT>=0.9, pTM>=0.9, ipTM>=0.8, either hbond_sasa filter (SASA<60, 2+ hbonds)
+	- /work/users/t/i/tigerz/kuhlman_lab/analysis/RapheSeq_binders/Phe/250125_denovo_3strand_more
+	- /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-02/250217_hlx_str_var_Phe/6.af3_hits_iptm_0.8_hb_sasa_all
+	- /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-01/250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all
+	
+run1: 250125_denovo_3strand_more
+run2: 250217_hlx_str_var_Phe/6.af3_hits_iptm_0.8_hb_sasa_all
+run3: 250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all_BAD
+run4: 250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all
+
+run5: 250217_hlx_str_var_Phe/6.af3_hits_iptm_0.8_hb_sasa_all_missing
+run6: 
+
+1) Get structure inputs
+for i in 4; do mkdir run_$i; done
+
+# copy hit files as .pdb 
+python /work/users/t/i/tigerz/kuhlman_lab/scripts/af3/cif_to_pdb.py -i /work/users/t/i/tigerz/kuhlman_lab/analysis/RapheSeq_binders/Phe/250125_denovo_3strand_more -o run_1
+python /work/users/t/i/tigerz/kuhlman_lab/scripts/af3/cif_to_pdb.py -i /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-02/250217_hlx_str_var_Phe/6.af3_hits_iptm_0.8_hb_sasa_all -o run_2
+
+python /work/users/t/i/tigerz/kuhlman_lab/scripts/af3/cif_to_pdb.py -i  /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-01/250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all_BAD -o run_3
+
+# grab pdb files
+cd /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-01/250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all_BAD
+for i in *.pdb; do echo $i; cp $i /work/users/t/i/tigerz/kuhlman_lab/rosetta/runs/2025-04/250416_Nterm_Phe/run_3/; done
+cd /work/users/t/i/tigerz/kuhlman_lab/rosetta/runs/2025-04/250416_Nterm_Phe/
+
+python /work/users/t/i/tigerz/kuhlman_lab/scripts/af3/cif_to_pdb.py -i  /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-01/250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all -o run_4
+
+# grab pdb files
+cd /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-01/250122_Nterm_denovo/6.Nterm_itpm_0.8_hbond_sasa_hits_all
+for i in *.pdb; do echo $i; cp $i /work/users/t/i/tigerz/kuhlman_lab/rosetta/runs/2025-04/250416_Nterm_Phe/run_4/; done
+cd /work/users/t/i/tigerz/kuhlman_lab/rosetta/runs/2025-04/250416_Nterm_Phe/
+
+# transfer pdbs for 5.
+
+python /work/users/t/i/tigerz/kuhlman_lab/scripts/af3/cif_to_pdb.py -i  /work/users/t/i/tigerz/kuhlman_lab/RFDiffAA/runs/2025-02/250217_hlx_str_var_Phe/6.af3_hits_iptm_0.8_hb_sasa_all_missing -o run_5
+
+
+# check size of dirs
+for i in */; do echo $i; tree -a $i | tail -1; echo ""; done
+
+# modify vanilla_score_interface.xml
+# modify interface_scoring.flags, 
+	# removed use -use_truncated termini
+	# -nstruct 20
+
+
+3) in sycamore terminal run:
+# need run_dir w/ 1) run_relax_2.sh, 2) vanilla_score_interface.xml, 3) interface_scoring.flags, 4) pdb_list.txt, 5) pdbs
+
+
+for i in 5; do
+  cp run_relax_sycamore.sh run_$i/
+  cp vanilla_score_interface.xml run_$i/
+  cp interface_scoring.flags run_$i/
+done
+
+for i in 5; do
+  cd run_$i
+  rm pdb_list.txt
+  for k in *.pdb; do echo $k >> pdb_list.txt; done
+  cd ../
+done
+
+# then run 
+for i in 5; do
+cd run_$i
+sbatch run_relax_sycamore.sh
+cd ../
+done
+
+
+
+6) process scorefiles
+#bash process_scorefile_rosetta.sh 
+
+
+for i in 6 7 8; do
+  cp 4.1_v1_mut${i}_runs/score.sc score_${i}.sc
+  cat score_${i}.sc | tr -s " " | sed 's/ /,/g' | tail -n +2 > score_${i}_mod2.csv 
+  python /nas/longleaf/home/tigerz/kuhlmanlab/scripts/rosetta/clean_rosetta_scorefile.py score_${i}_mod2.csv ${i} ""
+done
+
+sed -i "s/af3_//g" rosetta_scores*.csv
+
+
+
+# look at representative structures
+mkdir pdbs_001
+for i in 1 2 3 4; do
+cd run_$i
+for k in *0001.pdb; do cp $k ../pdbs_001/; done
+cd ../
+done
+
+
+
+# touch files
+/21dayscratch/scr/t/i/tigerz/kuhlman_lab/rosetta/runs/
+find /21dayscratch/scr/t/i/tigerz/kuhlman_lab/rosetta/runs/ -type f -exec touch {} +
+
+for i in */; do 
+	cd $i;	pwd
+	for j in */; do
+	cd $j; pwd
+	  rm -r output_cifs
+	  for k in */; do 
+	  cd $k; pwd
+	  rm -r output_cifs
+	  cd ../
+	  done
+	cd ../
+	done
+	cd ../
+done
+
+for i in *4.af3*/; do
+  cd $i; pwd
+  for j in */; do
+  cd $j; pwd
+  rm -r output_cifs
+  rm -r output_data
+  cd ../
+  done
+  cd ../
+done
+	  
